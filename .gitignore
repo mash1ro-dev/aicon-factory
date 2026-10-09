@@ -1,0 +1,15 @@
+﻿# Local application data and installation state
+/Library/
+/Backup/
+/Logs/
+/_package/
+/_design/
+/.aicon-*
+/Tests/.work/
+/Tests/Sandbox/
+/Tests/Results/
+# Temporary builds and local review files
+/IconFactory.build-*.exe
+*.log
+*.tmp
+*.bak
