@@ -13,6 +13,25 @@ using System.Threading.Tasks;
 
 namespace Aicon
 {
+    public sealed class SessionItem : System.ComponentModel.INotifyPropertyChanged
+    {
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        private void Changed(string name) { var handler = PropertyChanged; if (handler != null) handler(this, new System.ComponentModel.PropertyChangedEventArgs(name)); }
+        public string Id { get; set; }
+        public string Source { get; set; }
+        public string FileName { get; set; }
+        public string Name { get; set; }
+        public ImageResult Result { get; set; }
+        public string SizeKey { get; set; }
+        public string SavedPath { get; set; }
+        public string Error { get; set; }
+        private int number; public int Number { get { return number; } set { number=value; Changed("DisplayName"); } }
+        public string DisplayName { get { return Number+". "+FileName; } }
+        private string status; public string Status { get { return status; } set { status=value; Changed("Status"); } }
+        private bool saveChecked; public bool SaveChecked { get { return saveChecked; } set { saveChecked=value; Changed("SaveChecked"); } }
+        private bool isCurrent; public bool IsCurrent { get { return isCurrent; } set { isCurrent=value; Changed("IsCurrent"); } }
+        private object thumbnail; public object Thumbnail { get { return thumbnail; } set { thumbnail=value; Changed("Thumbnail"); } }
+    }
     public sealed class ImageResult
     {
         public byte[] Ico { get; internal set; }
@@ -85,6 +104,14 @@ namespace Aicon
 
         public static ImageResult Process(string source)
         {
+            return Process(source, IconSizes);
+        }
+
+        public static ImageResult Process(string source, int[] requestedSizes)
+        {
+            if (requestedSizes == null || requestedSizes.Length == 0) throw new ArgumentException("Choose at least one icon size.");
+            SortedSet<int> sizes = new SortedSet<int>(requestedSizes);
+            foreach (int size in sizes) if (Array.IndexOf(IconSizes, size) < 0) throw new ArgumentException("Unsupported icon size.");
             ImageHeader header;
             byte[] input = ReadValidatedSource(source, out header);
 
@@ -104,7 +131,7 @@ namespace Aicon
                 using (UniformRaster master = BuildUniformMaster(original,
                     new RectangleF(bounds.X, bounds.Y, bounds.Width, bounds.Height)))
                 {
-                    foreach (int size in IconSizes)
+                    foreach (int size in sizes)
                     {
                         List<GeometryTrace> geometry = new List<GeometryTrace>(master.Trace);
                         using (UniformRaster frame = RenderUniformFrame(master, size, geometry))
@@ -113,7 +140,7 @@ namespace Aicon
                     }
                 }
 
-                result.Preview = result.Frames[256];
+                result.Preview = result.Frames[sizes.Max];
                 result.Ico = BuildIcon(result.Frames);
                 return result;
             }
@@ -656,14 +683,15 @@ namespace Aicon
 
         private static byte[] BuildIcon(Dictionary<int, byte[]> frames)
         {
+            SortedSet<int> sizes = new SortedSet<int>(frames.Keys);
             using (MemoryStream stream = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(stream))
             {
                 writer.Write((ushort)0); // reserved
                 writer.Write((ushort)1); // icon, not cursor
-                writer.Write((ushort)IconSizes.Length);
-                uint offset = (uint)(6 + 16 * IconSizes.Length);
-                foreach (int size in IconSizes)
+                writer.Write((ushort)sizes.Count);
+                uint offset = (uint)(6 + 16 * sizes.Count);
+                foreach (int size in sizes)
                 {
                     byte[] frame = frames[size];
                     writer.Write((byte)(size == 256 ? 0 : size));
@@ -676,7 +704,7 @@ namespace Aicon
                     writer.Write(offset);
                     offset += (uint)frame.Length;
                 }
-                foreach (int size in IconSizes) writer.Write(frames[size]);
+                foreach (int size in sizes) writer.Write(frames[size]);
                 writer.Flush();
                 return stream.ToArray();
             }

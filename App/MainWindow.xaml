@@ -1,10 +1,4 @@
-﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="あいこんふぁくとりー" Width="944" Height="752" MinWidth="900" MinHeight="728"
-        WindowStartupLocation="CenterScreen" FontFamily="Yu Gothic UI, Meiryo, Segoe UI"
-        FontSize="12" Foreground="#233D55" UseLayoutRounding="True" SnapsToDevicePixels="True"
-        Background="#F5EFE6">
-  <Window.Resources>
+﻿<Window Icon="Assets/app.ico" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="あいこんふぁくとりー v0.1.1" Width="1060" Height="920" MinWidth="830" MinHeight="650" WindowStartupLocation="CenterScreen" FontFamily="Yu Gothic UI, Meiryo, Segoe UI" FontSize="12" Foreground="#233D55" Background="#F5EFE6" UseLayoutRounding="True">  <Window.Resources>
     <LinearGradientBrush x:Key="GlassFill" StartPoint="0,0" EndPoint="0.85,1">
       <GradientStop Color="#F5FFFFFF" Offset="0"/>
       <GradientStop Color="#EEFDFCF9" Offset="0.04"/>
@@ -62,32 +56,40 @@
       </Setter.Value></Setter>
     </Style>
     <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-      <Setter Property="Foreground" Value="#173E5E"/>
+      <Style.Resources><LinearGradientBrush x:Key="PrimaryEdge" StartPoint="0.15,0" EndPoint="0.7,1"><GradientStop Color="#FFFFFBED"/><GradientStop Color="#FFFFF2C3" Offset="0.35"/><GradientStop Color="#FFB49A53" Offset="0.75"/><GradientStop Color="#FFF2DFA2" Offset="1"/></LinearGradientBrush></Style.Resources>
+      <Setter Property="Foreground" Value="#57451F"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
       <Setter Property="FontSize" Value="17"/>
       <Setter Property="Height" Value="56"/>
       <Setter Property="Padding" Value="20,9"/>
-      <Setter Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0.15,0" EndPoint="0.7,1"><GradientStop Color="#C9F0FF" Offset="0"/><GradientStop Color="#98D6F0" Offset="0.30"/><GradientStop Color="#6EB8DC" Offset="0.68"/><GradientStop Color="#A3DAEF" Offset="0.90"/><GradientStop Color="#D7F4FF" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
+      <Setter Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0.15,0" EndPoint="0.7,1"><GradientStop Color="#FFF2BE" Offset="0"/><GradientStop Color="#F7DF8F" Offset="0.30"/><GradientStop Color="#ECCD72" Offset="0.68"/><GradientStop Color="#F5E2A1" Offset="0.90"/><GradientStop Color="#FFF4CF" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
       <Setter Property="Template"><Setter.Value>
         <ControlTemplate TargetType="Button">
           <Grid x:Name="Droplet" RenderTransformOrigin="0.5,0.5">
-            <Border x:Name="Chrome" CornerRadius="27,35,30,19" Background="{TemplateBinding Background}" BorderBrush="{StaticResource GlassEdge}" BorderThickness="1.6">
-              <Border.Effect><DropShadowEffect Color="#4E88A8" BlurRadius="9" ShadowDepth="4" Opacity="0.32"/></Border.Effect>
+            <Border x:Name="Chrome" CornerRadius="27,35,30,19" Background="{TemplateBinding Background}" BorderBrush="{StaticResource PrimaryEdge}" BorderThickness="1.6">
+              <Border.Effect><DropShadowEffect Color="#8D783E" BlurRadius="9" ShadowDepth="4" Opacity="0.32"/></Border.Effect>
             </Border>
-            <Border Margin="3,2,3,4" CornerRadius="24,31,27,16" BorderBrush="{StaticResource GlassEdge}" BorderThickness="1" IsHitTestVisible="False"/>
+            <Border x:Name="InnerEdge" Margin="3,2,3,4" CornerRadius="24,31,27,16" BorderBrush="{StaticResource PrimaryEdge}" BorderThickness="1" IsHitTestVisible="False"/>
             <Grid Margin="7,4,8,5" IsHitTestVisible="False">
               <Grid.RowDefinitions><RowDefinition Height="0.5*"/><RowDefinition Height="0.5*"/></Grid.RowDefinitions>
-              <Border CornerRadius="21,29,14,9"><Border.Background><LinearGradientBrush StartPoint="0.1,0" EndPoint="0.5,1"><GradientStop Color="#DEFFFFFF"/><GradientStop Color="#27FFFFFF" Offset="0.65"/><GradientStop Color="#00FFFFFF" Offset="1"/></LinearGradientBrush></Border.Background></Border>
-              <Border Grid.Row="1" Margin="9,0,8,0" CornerRadius="0,0,23,14" BorderThickness="0,0,0,3" BorderBrush="#D8F3FE"/>
+              <Border x:Name="TopGlaze" CornerRadius="21,29,14,9"><Border.Background><LinearGradientBrush StartPoint="0.1,0" EndPoint="0.5,1"><GradientStop Color="#DEFFFBEA"/><GradientStop Color="#27FFF6CF" Offset="0.65"/><GradientStop Color="#00FFF6CF" Offset="1"/></LinearGradientBrush></Border.Background></Border>
+              <Border x:Name="BottomSheen" Grid.Row="1" Margin="9,0,8,0" CornerRadius="0,0,23,14" BorderThickness="0,0,0,3" BorderBrush="#F9E7A8"/>
             </Grid>
             <Ellipse Width="24" Height="3" Fill="#70FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="21,7,0,0" IsHitTestVisible="False"/>
             <Ellipse Width="7" Height="3" Fill="#CCFFFFFF" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,7" IsHitTestVisible="False"/>
             <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
           </Grid>
           <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chrome" Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="0.4,1"><GradientStop Color="#D5F3FF"/><GradientStop Color="#81C9E9" Offset="0.68"/><GradientStop Color="#E1F7FF" Offset="1"/></LinearGradientBrush></Setter.Value></Setter></Trigger>
-            <Trigger Property="IsPressed" Value="True"><Setter TargetName="Droplet" Property="RenderTransform"><Setter.Value><ScaleTransform ScaleX="0.985" ScaleY="0.95"/></Setter.Value></Setter></Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Chrome" Property="BorderBrush" Value="#2E6791"/><Setter TargetName="Chrome" Property="BorderThickness" Value="2"/></Trigger>
-            <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Droplet" Property="Opacity" Value="0.68"/><Setter Property="Cursor" Value="Arrow"/></Trigger>
+            <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsEnabled" Value="True"/><Condition Property="IsMouseOver" Value="True"/></MultiTrigger.Conditions><Setter TargetName="Chrome" Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="0.4,1"><GradientStop Color="#FFF8D9"/><GradientStop Color="#F7DF96" Offset="0.68"/><GradientStop Color="#FFF9E2" Offset="1"/></LinearGradientBrush></Setter.Value></Setter></MultiTrigger>
+            <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsEnabled" Value="True"/><Condition Property="IsPressed" Value="True"/></MultiTrigger.Conditions><Setter TargetName="Droplet" Property="RenderTransform"><Setter.Value><ScaleTransform ScaleX="0.985" ScaleY="0.95"/></Setter.Value></Setter><Setter TargetName="Chrome" Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0,0" EndPoint="0.4,1"><GradientStop Color="#F5D779"/><GradientStop Color="#DBB650" Offset="0.68"/><GradientStop Color="#EDCD7B" Offset="1"/></LinearGradientBrush></Setter.Value></Setter></MultiTrigger>
+            <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsEnabled" Value="True"/><Condition Property="IsKeyboardFocused" Value="True"/></MultiTrigger.Conditions><Setter TargetName="Chrome" Property="BorderBrush" Value="#8A651D"/><Setter TargetName="Chrome" Property="BorderThickness" Value="2"/></MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Chrome" Property="Background" Value="#DADDE0"/><Setter TargetName="Chrome" Property="BorderBrush" Value="#B9BEC2"/>
+              <Setter TargetName="Chrome" Property="Effect"><Setter.Value><DropShadowEffect Color="#7C8084" BlurRadius="9" ShadowDepth="4" Opacity="0.32"/></Setter.Value></Setter>
+              <Setter TargetName="InnerEdge" Property="BorderBrush" Value="#E5E7E8"/><Setter TargetName="BottomSheen" Property="BorderBrush" Value="#F1F2F3"/>
+              <Setter TargetName="TopGlaze" Property="Background"><Setter.Value><LinearGradientBrush StartPoint="0.1,0" EndPoint="0.5,1"><GradientStop Color="#DEFFFFFF"/><GradientStop Color="#27FFFFFF" Offset="0.65"/><GradientStop Color="#00FFFFFF" Offset="1"/></LinearGradientBrush></Setter.Value></Setter>
+              <Setter TargetName="Droplet" Property="Opacity" Value="0.68"/><Setter Property="Foreground" Value="#65717A"/><Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value></Setter>
@@ -114,20 +116,34 @@
         <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="ComboFocus" Property="BorderBrush" Value="#3C7CA7"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.60"/></Trigger></ControlTemplate.Triggers>
       </ControlTemplate></Setter.Value></Setter>
     </Style>
+    <Style x:Key="RemoveImageButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="MinHeight" Value="25"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <!-- Keep the original row hit area; only the visible face is smaller. -->
+        <Grid x:Name="RemoveHitArea" Background="Transparent">
+          <Grid x:Name="RemoveFace" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+            <Ellipse x:Name="RemoveChrome" Fill="{TemplateBinding Background}" Stroke="{StaticResource GlassEdge}" StrokeThickness="1.2">
+              <Ellipse.Effect><DropShadowEffect Color="#71818D" BlurRadius="4" ShadowDepth="1.2" Opacity="0.22"/></Ellipse.Effect>
+            </Ellipse>
+            <Ellipse Margin="2" Stroke="#EFFFFFFF" StrokeThickness="0.8" IsHitTestVisible="False"/>
+            <Ellipse Width="16" Height="8" VerticalAlignment="Top" Margin="0,3,0,0" IsHitTestVisible="False"><Ellipse.Fill><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#BFFFFFFF"/><GradientStop Color="#05FFFFFF" Offset="1"/></LinearGradientBrush></Ellipse.Fill></Ellipse>
+            <Path x:Name="RemoveCross" Width="9" Height="9" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 1,1 L 9,9 M 9,1 L 1,9" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" IsHitTestVisible="False"/>
+          </Grid>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="RemoveChrome" Property="Fill" Value="#E6F4FB"/></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="RemoveChrome" Property="Fill" Value="#CEE1EB"/><Setter TargetName="RemoveFace" Property="RenderTransform"><Setter.Value><ScaleTransform ScaleX="0.96" ScaleY="0.96"/></Setter.Value></Setter></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RemoveChrome" Property="Stroke" Value="#3C7CA7"/><Setter TargetName="RemoveChrome" Property="StrokeThickness" Value="1.6"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="RemoveFace" Property="Opacity" Value="0.64"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
     <Style x:Key="Caption" TargetType="TextBlock"><Setter Property="Foreground" Value="#526477"/><Setter Property="FontSize" Value="11"/></Style>
     <Style x:Key="FieldLabel" TargetType="TextBlock"><Setter Property="Foreground" Value="#36516A"/><Setter Property="Margin" Value="1,0,0,4"/><Setter Property="FontSize" Value="11"/></Style>
     <DrawingBrush x:Key="Checker" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute"><DrawingBrush.Drawing><DrawingGroup><GeometryDrawing Brush="#F7FBFC"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,16,16"/></GeometryDrawing.Geometry></GeometryDrawing><GeometryDrawing Brush="#D9E8EE"><GeometryDrawing.Geometry><GeometryGroup><RectangleGeometry Rect="0,0,8,8"/><RectangleGeometry Rect="8,8,8,8"/></GeometryGroup></GeometryDrawing.Geometry></GeometryDrawing></DrawingGroup></DrawingBrush.Drawing></DrawingBrush>
-  </Window.Resources>
-  <Grid>
-    <Grid.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0.3,1"><GradientStop Color="#FAF8F3"/><GradientStop Color="#FFFDF9" Offset="0.35"/><GradientStop Color="#F0E6D7" Offset="1"/></LinearGradientBrush></Grid.Background>
-    <Grid IsHitTestVisible="False" ClipToBounds="True">
-      <Image Source="Assets/workspace-band.png" Height="155" VerticalAlignment="Top" Stretch="UniformToFill" Opacity="0.13"><Image.Effect><BlurEffect Radius="20"/></Image.Effect></Image>
-      <Image Source="Assets/wood-band.png" Height="130" VerticalAlignment="Bottom" Stretch="UniformToFill" Opacity="0.20"><Image.Effect><BlurEffect Radius="19"/></Image.Effect></Image>
-      <Border VerticalAlignment="Top" Height="130"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#14FFFFFF"/><GradientStop Color="#E6FAF8F3" Offset="1"/></LinearGradientBrush></Border.Background></Border>
-    </Grid>
-    <Grid Margin="18,10,18,10">
-      <Grid.RowDefinitions><RowDefinition Height="88"/><RowDefinition Height="*"/><RowDefinition Height="36"/></Grid.RowDefinitions>
-      <Grid Grid.Row="0">
+  </Window.Resources><Grid Margin="18,10"><Grid.RowDefinitions><RowDefinition Height="88"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>      <Grid Grid.Row="0">
         <Grid.ColumnDefinitions><ColumnDefinition Width="158"/><ColumnDefinition Width="*"/><ColumnDefinition Width="250"/></Grid.ColumnDefinitions>
         <StackPanel VerticalAlignment="Center">
           <Image x:Name="BrandLogo" Source="Assets/brand-logo.png" Width="139" Height="68" HorizontalAlignment="Left" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
@@ -135,112 +151,88 @@
         </StackPanel>
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0,0,0">
           <TextBlock Text="好きな一枚を、いつものアイコンに。" FontSize="15" FontWeight="SemiBold" Foreground="#29445A"/>
-          <TextBlock Text="画像をえらぶ → できあがりを見る → 使う場所へ" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+          <TextBlock Text="画像をえらぶ → 仕上がりを確認 → 選んで保存" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
         </StackPanel>
         <Grid Grid.Column="2"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="60"/></Grid.ColumnDefinitions>
           <Border CornerRadius="14" Background="#BCFFFFFF" BorderBrush="#D7D5CA" BorderThickness="1" Padding="10,8" VerticalAlignment="Center" Margin="0,0,7,0">
             <StackPanel><TextBlock Text="まずは画像をいれてね" Foreground="#3B5268" FontSize="11"/><TextBlock Text="Small Icons · Big Smiles" Foreground="#72818A" FontSize="9" Margin="0,3,0,0"/></StackPanel>
           </Border>
           <Image x:Name="BrandGuide" Grid.Column="1" Source="Assets/brand-guide.png" Height="82" Width="51" Stretch="Uniform" VerticalAlignment="Bottom" Margin="0,0,0,2" RenderOptions.BitmapScalingMode="HighQuality"/>
-          <TextBlock Text="v0.1.0" Grid.ColumnSpan="2" FontSize="9" Foreground="#82919A" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,2,0"/>
+          <TextBlock Text="v0.1.1" Grid.ColumnSpan="2" FontSize="9" Foreground="#82919A" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,2,0"/>
         </Grid>
       </Grid>
-      <ScrollViewer x:Name="BodyScroller" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Padding="0,4,3,4">
-        <Grid MinWidth="824" Width="{Binding ViewportWidth, ElementName=BodyScroller}">
-          <Grid.RowDefinitions><RowDefinition Height="342"/><RowDefinition Height="10"/><RowDefinition Height="186"/></Grid.RowDefinitions>
-          <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="0.94*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="1.06*"/></Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Style="{StaticResource Card}">
-              <Grid>
-                <Grid.RowDefinitions><RowDefinition Height="24"/><RowDefinition Height="126"/><RowDefinition Height="10"/><RowDefinition Height="54"/><RowDefinition Height="10"/><RowDefinition Height="56"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                <TextBlock Text="01   画像をえらぶ" FontFamily="Yu Gothic UI" FontSize="14" FontWeight="Medium"/>
-                <Border x:Name="DropZone" Grid.Row="1" CornerRadius="16" Background="#EEF3F5" BorderBrush="#A8B4BE" BorderThickness="1" AllowDrop="True" ToolTip="PNG / JPEG / WebP 画像をまとめてドロップ">
-                  <Grid Margin="8">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="112"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <Border x:Name="SingleSourcePanel" CornerRadius="12" Background="{StaticResource Checker}" Width="108" Height="108" VerticalAlignment="Center" ClipToBounds="True">
-                      <Grid><TextBlock x:Name="SourcePlaceholder" Text="＋" Foreground="#8CA5B7" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center"/><Image x:Name="SourcePreview" Width="100" Height="100" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/></Grid>
-                    </Border>
-                                        <ScrollViewer x:Name="BatchSourcePanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Width="112" Height="108">
-                      <TextBlock x:Name="BatchSourceList" FontSize="10" TextWrapping="Wrap" Foreground="#36516A"/>
-                    </ScrollViewer>
-                    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
-                      <TextBlock Text="ここに画像をドロップ" FontWeight="SemiBold" FontSize="12"/>
-                      <TextBlock Text="PNG · JPEG · WebP" Style="{StaticResource Caption}" Margin="0,3,0,6"/>
-                      <Button x:Name="ChooseImageButton" Content="画像を選ぶ" HorizontalAlignment="Left" Padding="15,5"/>
-                      <TextBlock x:Name="SourceFileLabel" Text="画像はまだ選ばれていません" Style="{StaticResource Caption}" Margin="0,5,0,0" TextTrimming="CharacterEllipsis" MaxWidth="215"/>
-                    </StackPanel>
-                  </Grid>
-                </Border>
-                <Grid Grid.Row="3">
-                  <Grid.ColumnDefinitions><ColumnDefinition Width="1.15*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="1*"/></Grid.ColumnDefinitions>
-                  <StackPanel><TextBlock Text="アイコン名" Style="{StaticResource FieldLabel}"/><TextBox x:Name="IconNameBox" MaxLength="100" AutomationProperties.Name="アイコン名" ToolTip="保存するアイコンの名前"/></StackPanel>
-                  <StackPanel Grid.Column="2"><TextBlock Text="カテゴリ" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="CategoryBox" SelectedIndex="0" AutomationProperties.Name="カテゴリ"><ComboBoxItem Content="AI"/><ComboBoxItem Content="Image"/><ComboBoxItem Content="Audio"/><ComboBoxItem Content="Development"/><ComboBoxItem Content="Tools"/><ComboBoxItem Content="Apps"/><ComboBoxItem Content="Other"/></ComboBox></StackPanel>
-                </Grid>
-                <Button x:Name="GenerateButton" Grid.Row="5" Content="アイコン化する" Style="{StaticResource PrimaryButton}" IsEnabled="False"/>
-                <TextBlock Grid.Row="6" Text="透過PNGがおすすめ。背景は自動で消えません。&#10;元画像は変更しません。" TextAlignment="Center" Style="{StaticResource Caption}" FontSize="10" Margin="0,7,0,0" HorizontalAlignment="Center"/>
-              </Grid>
-            </Border>
-            <Border Grid.Column="2" Style="{StaticResource Card}">
-              <Grid>
-                <Grid.RowDefinitions><RowDefinition Height="23"/><RowDefinition Height="18"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                <Grid x:Name="BatchResultsPanel" Grid.Row="2" Visibility="Collapsed" Margin="0,8,0,0">
-                  <Grid.RowDefinitions><RowDefinition Height="34"/><RowDefinition Height="*"/><RowDefinition Height="24"/></Grid.RowDefinitions>
-                  <TextBlock x:Name="BatchSummaryText" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Text="画像ごとにICOを保存します"/>
-                  <ListBox x:Name="BatchResultsList" Grid.Row="1" Background="#F9FCFD" BorderBrush="#C9D8DF" BorderThickness="1" Padding="8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,3,0,5"/></DataTemplate></ListBox.ItemTemplate>
-                  </ListBox>
-                  <TextBlock Grid.Row="2" Text="一括モードは保存のみ。対象への適用は行いません。" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
-                </Grid>
-                <TextBlock Text="02   できあがりを見てみよう" FontSize="14" FontWeight="Medium"/>
-                <TextBlock x:Name="PreviewCaption" Grid.Row="1" Text="透過チェックと、小さいサイズもチェック" Style="{StaticResource Caption}"/>
-                <Grid x:Name="SinglePreviewPanel" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                  <Grid.ColumnDefinitions><ColumnDefinition Width="258"/><ColumnDefinition Width="14"/><ColumnDefinition Width="72"/></Grid.ColumnDefinitions>
-                  <StackPanel>
-                    <Border Width="258" Height="258" Background="{StaticResource Checker}" BorderBrush="#A5B5C0" BorderThickness="1" CornerRadius="13">
-                      <Grid><TextBlock x:Name="PreviewPlaceholder" Text="ここに仕上がりが表示されます" FontSize="12" Foreground="#465D75" HorizontalAlignment="Center" VerticalAlignment="Center"/><Image x:Name="Preview256" Width="256" Height="256" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="NearestNeighbor"/></Grid>
-                    </Border>
-                    <TextBlock Text="256 px" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                  </StackPanel>
-                  <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                    <Border Width="72" Height="72" Background="{StaticResource Checker}" BorderBrush="#A5B5C0" BorderThickness="1" CornerRadius="13"><Image x:Name="Preview48" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/></Border>
-                    <TextBlock Text="48 px" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,5,0,14"/>
-                    <Border Width="58" Height="58" Background="{StaticResource Checker}" BorderBrush="#A5B5C0" BorderThickness="1" CornerRadius="11"><Image x:Name="Preview32" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/></Border>
-                    <TextBlock Text="32 px" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,5,0,14"/>
-                    <Border Width="42" Height="42" Background="{StaticResource Checker}" BorderBrush="#A5B5C0" BorderThickness="1" CornerRadius="10"><Image x:Name="Preview16" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/></Border>
-                    <TextBlock Text="16 px" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                  </StackPanel>
-                </Grid>
-              </Grid>
-            </Border>
-          </Grid>
-          <Border Grid.Row="2" Style="{StaticResource Card}" Padding="12,10">
-            <Grid>
-              <Grid.RowDefinitions><RowDefinition Height="24"/><RowDefinition Height="32"/><RowDefinition Height="8"/><RowDefinition Height="54"/><RowDefinition Height="8"/><RowDefinition Height="40"/></Grid.RowDefinitions>
-              <DockPanel><TextBlock Text="03   どこで使う？" FontSize="14" FontWeight="Medium"/><TextBlock Text="フォルダの見た目を変更 / ファイルはショートカットを作成" Style="{StaticResource Caption}" HorizontalAlignment="Right" Margin="12,2,0,0"/></DockPanel>
-              <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="42"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="96"/><ColumnDefinition Width="8"/><ColumnDefinition Width="96"/></Grid.ColumnDefinitions>
-                <TextBlock Text="対象" VerticalAlignment="Center" FontSize="11"/><TextBox x:Name="TargetBox" Grid.Column="1" AutomationProperties.Name="適用する対象のパス" ToolTip="フォルダ・ファイル・ショートカットのパス"/>
-                <Button x:Name="ChooseTargetFileButton" Grid.Column="3" Content="ファイル" Padding="10,5"/><Button x:Name="ChooseTargetFolderButton" Grid.Column="5" Content="フォルダ" Padding="10,5"/>
-              </Grid>
-              <Grid Grid.Row="3"><Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="34"/><ColumnDefinition Width="14"/><ColumnDefinition Width="215"/></Grid.ColumnDefinitions>
-                <StackPanel><TextBlock Text="ショートカットの保存先" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="DestinationBox" SelectedIndex="0" AutomationProperties.Name="ショートカットの保存先"><ComboBoxItem Content="デスクトップ" Tag="Desktop"/><ComboBoxItem Content="対象と同じフォルダ" Tag="SameFolder"/><ComboBoxItem Content="指定フォルダ" Tag="Custom"/></ComboBox></StackPanel>
-                <StackPanel Grid.Column="2"><TextBlock Text="指定フォルダを選んだときの保存先" Style="{StaticResource FieldLabel}"/><TextBox x:Name="OutputDirectoryBox" IsEnabled="False" AutomationProperties.Name="指定する保存先フォルダ"/></StackPanel>
-                <Button x:Name="ChooseOutputButton" Grid.Column="4" Content="…" IsEnabled="False" Margin="0,17,0,0" Padding="4" ToolTip="保存先フォルダを選ぶ" AutomationProperties.Name="保存先フォルダを選ぶ"/>
-                <StackPanel Grid.Column="6"><TextBlock Text="ショートカット名（空欄なら対象名）" Style="{StaticResource FieldLabel}"/><TextBox x:Name="ShortcutNameBox" MaxLength="100" AutomationProperties.Name="ショートカット名"/></StackPanel>
-              </Grid>
-              <Grid Grid.Row="5"><Grid.ColumnDefinitions><ColumnDefinition Width="155"/><ColumnDefinition Width="10"/><ColumnDefinition Width="151"/><ColumnDefinition Width="*"/><ColumnDefinition Width="78"/></Grid.ColumnDefinitions>
-                <Button x:Name="ApplyButton" Content="対象へ適用" Background="#E2EDF3" IsEnabled="False"/>
-                <Button x:Name="OpenLocationButton" Grid.Column="2" Content="保存場所を開く" IsEnabled="False"/>
-                <TextBlock Grid.Column="3" Text="管理者権限は使いません" Style="{StaticResource Caption}" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,10,0"/>
-                <Button x:Name="CancelButton" Grid.Column="4" Content="中止" Visibility="Collapsed" Padding="8,4"/>
-              </Grid>
-            </Grid>
-          </Border>
-        </Grid>
-      </ScrollViewer>
-      <Grid Grid.Row="2" Margin="3,2,3,0"><Grid.RowDefinitions><RowDefinition Height="22"/><RowDefinition Height="12"/></Grid.RowDefinitions>
-        <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="82"/></Grid.ColumnDefinitions><TextBlock x:Name="StatusText" Text="まずは画像をいれてね。PNG・JPEG・WebPを使えます。" Foreground="#34536B" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/><ProgressBar x:Name="BusyIndicator" Grid.Column="1" Height="3" IsIndeterminate="True" Visibility="Collapsed" Foreground="#70B7D9" Background="#E3EBEF" VerticalAlignment="Center"/></Grid>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"><TextBlock Text="真城 @ BLUEFATHOM" FontSize="9" Foreground="#8A847A"/><TextBlock x:Name="GitHubFooter" Visibility="Collapsed" Margin="10,0,0,0" FontSize="9"><Hyperlink x:Name="GitHubLink" Foreground="#7D8C96" TextDecorations="None">GitHub</Hyperlink></TextBlock></StackPanel>
-      </Grid>
-    </Grid>
-  </Grid>
-</Window>
+<ScrollViewer x:Name="BodyScroller" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,5,8,5">
+<StackPanel>
+<Grid><Grid.ColumnDefinitions><ColumnDefinition Width="0.95*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="1.15*"/></Grid.ColumnDefinitions>
+<Border Style="{StaticResource Card}"><StackPanel>
+<TextBlock Text="01   画像をえらぶ" FontSize="16" Margin="0,0,0,8"/>
+<WrapPanel><Button x:Name="ChooseImageButton" Content="画像を追加"/><Button x:Name="RemoveButton" Content="一覧から外す" Margin="5,0"/><Button x:Name="ClearButton" Content="すべて解除"/></WrapPanel>
+<TextBlock Text="Ctrl / Shift で除外対象を複数選択。保存チェックとは別です。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,7,0,4"/>
+<Border x:Name="DropZone" AllowDrop="True" Background="#EEF3F5" BorderBrush="#B5C4CD" BorderThickness="1" CornerRadius="10" Padding="3">
+<ListBox x:Name="InputList" SelectionMode="Extended" Height="230" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" AutomationProperties.Name="入力画像と除外対象">
+<ListBox.ItemTemplate><DataTemplate><Border x:Name="ActiveBorder" BorderThickness="3,0,0,0" Padding="4" BorderBrush="Transparent"><Grid>
+<Grid.ColumnDefinitions><ColumnDefinition Width="40"/><ColumnDefinition Width="*"/><ColumnDefinition Width="75"/><ColumnDefinition Width="27"/></Grid.ColumnDefinitions>
+<Image Source="{Binding Thumbnail}" Width="36" Height="36" Stretch="Uniform"/>
+<StackPanel Grid.Column="1" Margin="5,0"><TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Source}"/><TextBlock Text="{Binding Status}" FontSize="10" Foreground="#697986"/></StackPanel>
+<CheckBox Grid.Column="2" Content="保存する" IsChecked="{Binding SaveChecked, Mode=TwoWay}" Tag="{Binding Id}" VerticalAlignment="Center" Focusable="False"/>
+<Button Grid.Column="3" Content="×" Tag="{Binding Id}" Style="{StaticResource RemoveImageButton}" ToolTip="この画像を一覧から外す"/>
+</Grid></Border><DataTemplate.Triggers><DataTrigger Binding="{Binding IsCurrent}" Value="True"><Setter TargetName="ActiveBorder" Property="BorderBrush" Value="#D7B657"/><Setter TargetName="ActiveBorder" Property="Background" Value="#FFF4CF"/></DataTrigger></DataTemplate.Triggers></DataTemplate></ListBox.ItemTemplate>
+</ListBox></Border>
+<TextBlock x:Name="ModeText" Text="PNG・JPEG・静止WebPをここへドロップ" Style="{StaticResource Caption}" Margin="0,7,0,5" TextWrapping="Wrap"/>
+<StackPanel x:Name="SingleNamePanel"><TextBlock Text="アイコン名" Style="{StaticResource FieldLabel}"/><TextBox x:Name="IconNameBox" MaxLength="100"/></StackPanel>
+<TextBlock Text="カテゴリ" Style="{StaticResource FieldLabel}" Margin="0,8,0,3"/>
+<ComboBox x:Name="CategoryBox" SelectedIndex="0"><ComboBoxItem Content="Image"/><ComboBoxItem Content="Audio"/><ComboBoxItem Content="Development"/><ComboBoxItem Content="Tools"/><ComboBoxItem Content="Apps"/><ComboBoxItem Content="Business"/><ComboBoxItem Content="AI"/><ComboBoxItem Content="Other"/></ComboBox>
+<TextBlock Text="画像がアイコンになります。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,8"/>
+<Button x:Name="GenerateButton" Content="仕上がりを確認" Style="{StaticResource PrimaryButton}" IsEnabled="False"/>
+<TextBlock x:Name="GenerateReason" Text="画像を追加してください。ここでは保存しません。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+<TextBlock Text="元画像は変更しません。背景の自動除去は行いません。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+</StackPanel></Border>
+<Border Grid.Column="2" Style="{StaticResource Card}"><StackPanel>
+<TextBlock Text="02   仕上がりを確認" FontSize="16" Margin="0,0,0,8"/>
+<ScrollViewer x:Name="NumberScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"><StackPanel x:Name="NumberPanel" Orientation="Horizontal"/></ScrollViewer>
+<TextBlock x:Name="CurrentLabel" Text="画像を選んでください" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,7"/>
+<Border Width="258" Height="258" HorizontalAlignment="Center" Background="{StaticResource Checker}" BorderBrush="#A5B5C0" BorderThickness="1" CornerRadius="13"><Grid><Image x:Name="Preview256" Width="256" Height="256" Stretch="Uniform"/><TextBlock x:Name="PreviewPlaceholder" Text="仕上がりを確認してください" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid></Border>
+<TextBlock x:Name="PreviewStatus" Text="完成プレビューは保存するICOと同じ内容です。" TextWrapping="Wrap" Margin="0,8" Style="{StaticResource Caption}"/>
+<WrapPanel><Button x:Name="CheckAllButton" Content="すべて選択"/><Button x:Name="UncheckAllButton" Content="すべて外す" Margin="5,0"/><TextBlock x:Name="CheckCount" VerticalAlignment="Center"/></WrapPanel>
+<TextBlock Text="アイコンの保存先" Style="{StaticResource FieldLabel}" Margin="0,10,0,3"/>
+<RadioButton x:Name="LibrarySaveOption" GroupName="IcoSaveMode" Tag="Library" Content="アプリの保管庫に保存（おすすめ）" Margin="0,3"/>
+<TextBlock Text="作成したアイコンを、カテゴリごとにまとめて保管します。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="18,0,0,5"/>
+<RadioButton x:Name="CustomSaveOption" GroupName="IcoSaveMode" Tag="Custom" Content="好きなフォルダに保存" Margin="0,3"/>
+<TextBlock Text="自分で保存場所を指定できます。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="18,0,0,5"/>
+<TextBlock Text="実際の保存先" Style="{StaticResource Caption}" Margin="0,2"/>
+<DockPanel><Button x:Name="ChooseIcoOutputButton" Content="フォルダを選ぶ" DockPanel.Dock="Right" VerticalAlignment="Top"/><TextBox x:Name="IcoOutputBox" IsReadOnly="True" TextWrapping="Wrap" Height="Auto" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top" Margin="0,0,5,0"/></DockPanel>
+<TextBlock x:Name="CustomSaveWarning" Text="保存した ICO を移動・削除すると、設定したアイコンが表示されなくなることがあります" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,4,0,5"/>
+<TextBlock x:Name="StorageNotice" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,4,0,5"/>
+<Button x:Name="SaveButton" Content="選んだアイコンを保存" Style="{StaticResource PrimaryButton}" IsEnabled="False"/>
+<TextBlock x:Name="SaveReason" Text="仕上がりを確認して「保存する」にチェックしてください。" TextWrapping="Wrap" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+</StackPanel></Border></Grid>
+<Border Style="{StaticResource Card}" Margin="0,12,0,0"><StackPanel>
+<TextBlock Text="03   アイコンを設定する（必要な人だけ）" FontSize="16"/>
+<TextBlock Text="作ったアイコンを、フォルダやショートカットに設定できるよ。" TextWrapping="Wrap" Margin="0,6,0,2"/>
+<DockPanel Margin="0,6"><Image x:Name="ApplyPreview" Width="48" Height="48" Stretch="Uniform" Margin="0,0,9,0"/><TextBlock x:Name="ApplyIconLabel" Text="いま設定するアイコン：02で画像を選んでね。" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/></DockPanel>
+<TextBlock Text="01のチェックは、保存する画像を選ぶためのものだよ。ここでは02に表示している1枚を使います。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,0,6"/>
+<TextBlock Text="アイコンを設定する場所" Style="{StaticResource FieldLabel}"/>
+<DockPanel><Button x:Name="ChooseTargetButton" DockPanel.Dock="Right" Content="アイコンを設定する場所を選ぶ"/><TextBox x:Name="TargetBox" AllowDrop="True" Margin="0,0,7,0" ToolTip="フォルダ・既存ショートカット・EXE等のパスを入力、またはドロップ"/></DockPanel>
+<TextBlock x:Name="TargetKindText" Text="フォルダ・既存ショートカット・EXE等を選択／ドロップできます。" Style="{StaticResource Caption}" Margin="0,5" TextWrapping="Wrap"/>
+<StackPanel x:Name="ShortcutPanel" Visibility="Collapsed">
+<TextBlock Text="元ファイルは変更せず、新しいショートカットを作ります。" TextWrapping="Wrap"/>
+<Expander x:Name="ShortcutSettings" Header="保存先を変更・ショートカット名を編集" Margin="0,5"><StackPanel Margin="0,5">
+<TextBlock Text="新しい .lnk の保存先です。ICOの保存先とは別です。" Style="{StaticResource Caption}"/>
+<ComboBox x:Name="DestinationBox" SelectedIndex="0"><ComboBoxItem Content="デスクトップ" Tag="Desktop"/><ComboBoxItem Content="対象と同じフォルダ" Tag="SameFolder"/><ComboBoxItem Content="指定フォルダ" Tag="Custom"/></ComboBox>
+<DockPanel x:Name="CustomShortcutPanel" Visibility="Collapsed" Margin="0,5"><Button x:Name="ChooseOutputButton" Content="保存先を変更" DockPanel.Dock="Right"/><TextBox x:Name="OutputDirectoryBox" Margin="0,0,5,0"/></DockPanel>
+<TextBlock Text="ショートカット名" Style="{StaticResource FieldLabel}"/><TextBox x:Name="ShortcutNameBox" MaxLength="100"/>
+</StackPanel></Expander></StackPanel>
+<Button x:Name="ApplyButton" Content="アイコンを設定" Style="{StaticResource PrimaryButton}" IsEnabled="False" HorizontalAlignment="Left" MinWidth="220" Margin="0,7,0,3"/>
+<Button x:Name="ApplyMoreButton" Content="ほかの場所にも設定する" Visibility="Collapsed" HorizontalAlignment="Left" Margin="0,5,0,3"/>
+<TextBlock x:Name="ApplyReason" Text="まずアイコンを保存してください。" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+<TextBlock Text="設定後にICOを移動・削除すると参照が切れます。安定したICO保管庫をおすすめします。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+<Expander Header="アイコンを設定したあとについて" Margin="0,8,0,0">
+<TextBlock Text="フォルダのアイコンは、変更してもすぐに見た目が切り替わらないことがあります。&#xA;そんなときは、少し待ってみてね。&#xA;それでも変わらない場合は、デスクトップの何もないところをクリックして、F5キーで表示を更新してみてください。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+</Expander>
+</StackPanel></Border>
+</StackPanel></ScrollViewer>
+<Grid Grid.Row="2" Margin="3,6,3,0"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+<DockPanel><Button x:Name="CancelButton" Content="中止" DockPanel.Dock="Right" Visibility="Collapsed"/><ProgressBar x:Name="BusyIndicator" DockPanel.Dock="Right" Width="70" Height="4" IsIndeterminate="True" Visibility="Collapsed"/><TextBlock x:Name="StatusText" Text="画像を追加して、保存前に仕上がりを確認しましょう。" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DockPanel>
+<DockPanel Grid.Row="1" Margin="0,5,0,0"><Button x:Name="OpenLocationButton" Content="アイコンが保存された場所を開く" DockPanel.Dock="Left" IsEnabled="False" FontSize="11"/><TextBlock Text="管理者権限は使いません" VerticalAlignment="Center" Margin="10,0" Style="{StaticResource Caption}"/><TextBlock x:Name="GitHubFooter" Visibility="Collapsed"><Hyperlink x:Name="GitHubLink">GitHub</Hyperlink></TextBlock></DockPanel>
+</Grid>
+</Grid></Window>

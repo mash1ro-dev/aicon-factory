@@ -1,7 +1,7 @@
 ﻿#Requires -Version 5.1
 Set-StrictMode -Version Latest
 $script:DefaultRoot = Split-Path -Parent $PSScriptRoot
-$script:Categories = @('AI','Image','Audio','Development','Tools','Apps','Other')
+$script:Categories = @('Image','Audio','Development','Tools','Apps','Business','AI','Other')
 function Assert-AiconWindows {
     if ($env:OS -ne 'Windows_NT') { throw 'Windows 11 が必要です。' }
 }
@@ -12,21 +12,20 @@ function Assert-AiconName {
 }
 function Get-AiconFullPath {
     param([Parameter(Mandatory)][string]$Path)
-    if ($Path -notmatch '^[A-Za-z]:[\\/]') { throw 'ローカルの絶対パスを指定してください。' }
-    foreach ($segment in ($Path.Substring(3) -split '[\\/]')) {
-        if ($segment -and ($segment -in @('.','..') -or $segment -match '[. ]$|[<>"|?*\x00-\x1f]' -or $segment -match '^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)')) { throw 'パスに無効な要素が含まれています。' }
-    }
-    $full = [IO.Path]::GetFullPath($Path)
-    if ($full.Substring(2).Contains(':')) { throw '代替データストリームは使用できません。' }
-    $cursor = $full
-    while ($cursor) {
-        if ([IO.File]::Exists($cursor) -or [IO.Directory]::Exists($cursor)) {
-            if (([IO.File]::GetAttributes($cursor) -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'リンク／ジャンクション経由のパスは使用できません。' }
-        }
-        $parent = [IO.Path]::GetDirectoryName($cursor.TrimEnd('\'))
-        if ($parent -eq $cursor) { break }; $cursor = $parent
-    }
-    return $full
+    Initialize-AiconPathValidation
+    return [Aicon.PathValidation]::Validate($Path)
+}
+function Initialize-AiconPathValidation {
+    if(-not ('Aicon.PathValidation' -as [type])){Add-Type -Path (Join-Path $PSScriptRoot 'PathValidation.cs') -ErrorAction Stop}
+}
+function Get-AiconDesktopDirectory {
+    Initialize-AiconPathValidation
+    return [Aicon.PathValidation]::DesktopDirectory()
+}
+function Get-AiconApplyPathIdentity([string]$Icon,[string]$Target,[string]$DestinationDirectory,[string]$Root) {
+    Initialize-AiconPathValidation
+    $identities=@(foreach($path in @($Icon,$Target,$DestinationDirectory,$Root)){if($path){[Aicon.PathValidation]::Identity($path)}})
+    return ($identities -join '|')
 }
 function Assert-AiconWritableTarget {
     param([Parameter(Mandatory)][string]$Path)
@@ -48,9 +47,35 @@ function Initialize-AiconRoot {
     return $rootPath
 }
 function Write-AiconLog {
-    param([string]$Root,[string]$Operation,[string]$Source,[string]$Icon,[string]$Target,[bool]$Success,[string]$ErrorMessage='')
+    param([string]$Root,[string]$Operation,[string]$Source,[string]$Icon,[string]$Target,[bool]$Success,[string]$ErrorMessage='',[switch]$PassThru,[string]$Phase='',[string]$BackupId='')
     $record = [ordered]@{Timestamp=[DateTime]::UtcNow.ToString('o');Operation=$Operation;Source=$Source;Icon=$Icon;Target=$Target;Success=$Success;Error=$ErrorMessage}
-    try { Add-Content -LiteralPath (Get-AiconFullPath (Join-Path $Root ('Logs\'+(Get-Date -Format yyyy-MM-dd)+'.jsonl'))) -Value ($record | ConvertTo-Json -Compress) -Encoding UTF8 -ErrorAction Stop } catch { Write-Warning ('ログを保存できません: '+$_.Exception.Message) }
+    if($Phase){$record.Phase=$Phase};if($BackupId){$record.BackupId=$BackupId}
+    try { Add-Content -LiteralPath (Get-AiconFullPath (Join-Path $Root ('Logs\'+(Get-Date -Format yyyy-MM-dd)+'.jsonl'))) -Value ($record | ConvertTo-Json -Compress) -Encoding UTF8 -ErrorAction Stop; if($PassThru){return $true} } catch { if($PassThru){return $false};Write-Warning ('ログを保存できません: '+$_.Exception.Message) }
+}
+function ConvertTo-AiconFileAttributes([int]$Value) {
+    # PS5's direct enum cast rejects newer Windows flags (e.g. PINNED/UNPINNED).
+    # Preserve the observed bit pattern; do not mask provider flags or set pin policy.
+    return [Enum]::ToObject([IO.FileAttributes],$Value)
+}
+function Assert-AiconApplied($Backup) {
+    $r=$Backup.Record
+    if((Get-AiconHash (Get-AiconFullPath $r.Path)) -ne $r.AfterHash){throw '書き込んだアイコン設定を確認できません。'}
+    if(([int][IO.File]::GetAttributes($r.Path) -band 7) -ne ([int]$r.AfterFileAttributes -band 7)){throw 'アイコン設定に必要なファイル属性を確認できません。'}
+    if($r.Folder -and (([int][IO.File]::GetAttributes((Get-AiconFullPath $r.Folder)) -band 7) -ne ([int]$r.AfterFolderAttributes -band 7))){throw 'アイコン設定に必要なフォルダ属性を確認できません。'}
+}
+function Complete-AiconApplyNotifications([string]$Root,[string]$Icon,[string]$Target,[string]$BackupId) {
+    $warnings=[Collections.Generic.List[string]]::new();$refresh=$false;$logged=$false
+    try {
+        $notice=@(& {Invoke-AiconRefresh $Target} 2>&1)
+        if(@($notice|Where-Object {$_ -is [Management.Automation.ErrorRecord]}).Count){throw 'Refresh notification failed'}
+        $refresh=$true
+    } catch { $warnings.Add('表示の更新をお知らせできなかったよ。見た目が変わらないときは、少し待ってみてね。') }
+    try {
+        $log=@(& {Write-AiconLog $Root 'Apply' '' $Icon $Target $true -PassThru -Phase $(if($refresh){'Verified'}else{'VerifiedDisplayNotificationFailed'}) -BackupId $BackupId} 2>&1)
+        $logged=($log.Count -eq 1 -and $log[0] -is [bool] -and $log[0])
+    } catch { $logged=$false }
+    if(-not $logged){$warnings.Add('アイコンの設定は保存できたけれど、操作ログを記録できなかったよ。')}
+    return [pscustomobject]@{RefreshRequested=$refresh;LogRecorded=$logged;Warnings=$warnings.ToArray()}
 }
 function Initialize-AiconEngine {
     if (-not ('Aicon.ImageEngine' -as [type])) {
@@ -62,7 +87,7 @@ function New-AiconReservedFile {
     param([string]$Directory,[string]$Name,[string]$Extension)
     for ($i=1;$i -le 9999;$i++) {
         $suffix = if ($i -eq 1) { '' } else { '_{0:D2}' -f $i }
-        $path = Join-Path $Directory ($Name+$suffix+$Extension)
+        $path = Get-AiconFullPath (Join-Path $Directory ($Name+$suffix+$Extension))
         try { $stream = [IO.File]::Open($path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None);return [pscustomobject]@{Path=$path;Stream=$stream} }
         catch [IO.IOException] { if ([IO.File]::Exists($path)) { continue };throw }
     }
@@ -195,8 +220,8 @@ function Invoke-AiconBackupRestore {
             if ((Get-AiconHash $path) -ne $current) { throw '復元準備中に対象が変更されました。' }
             [IO.File]::SetAttributes($path,[IO.FileAttributes]::Normal);[IO.File]::Delete($path)
         }
-        if ($r.Existed) { [IO.File]::SetAttributes($path,[IO.FileAttributes]$r.FileAttributes) }
-        if ($folder) { [IO.File]::SetAttributes($folder,[IO.FileAttributes]$r.FolderAttributes) }
+        if ($r.Existed) { [IO.File]::SetAttributes($path,(ConvertTo-AiconFileAttributes $r.FileAttributes)) }
+        if ($folder) { [IO.File]::SetAttributes($folder,(ConvertTo-AiconFileAttributes $r.FolderAttributes)) }
         $r.State=$FinalState;Write-AiconManifest $Directory $r
     } finally { if ($stage -and [IO.File]::Exists($stage)) { [IO.File]::Delete($stage) } }
     return $path
@@ -208,13 +233,23 @@ function Invoke-AiconRefresh {
 }
 function Set-AiconFactoryIcon {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][string]$Icon,[Parameter(Mandatory)][string]$Target,[string]$Root=$script:DefaultRoot,[ValidateSet('Desktop','SameFolder','Custom')][string]$Destination='Desktop',[string]$OutputDirectory,[string]$ShortcutName)
-    $rootPath=Initialize-AiconRoot $Root;$backup=$null;$reserved=$null;$shell=$null;$link=$null;$stage=$null;$mutationStarted=$false;$ownedReservation=$null;$targetLock=$null
+    param([Parameter(Mandatory)][string]$Icon,[Parameter(Mandatory)][string]$Target,[string]$Root=$script:DefaultRoot,[ValidateSet('Desktop','SameFolder','Custom')][string]$Destination='Desktop',[string]$OutputDirectory,[string]$ShortcutName,[string]$ExpectedPathIdentity,[string]$ExpectedIconHash)
+    $rootPath=Initialize-AiconRoot $Root;$backup=$null;$reserved=$null;$shell=$null;$link=$null;$stage=$null;$mutationStarted=$false;$ownedReservation=$null;$targetLock=$null;$pathLease=$null;$phase='Validate'
     try {
         $ico=Get-AiconFullPath $Icon
         if (-not [IO.File]::Exists($ico) -or [IO.Path]::GetExtension($ico) -ine '.ico') { throw '存在する ICO ファイルを指定してください。' }
         $t=Get-AiconFullPath $Target
         if (-not (Test-Path -LiteralPath $t)) { throw '適用対象が見つかりません。' }
+        $dest=''
+        if([IO.File]::Exists($t) -and [IO.Path]::GetExtension($t) -ine '.lnk'){
+            $dest=switch($Destination){'Desktop'{Get-AiconDesktopDirectory} 'SameFolder'{[IO.Path]::GetDirectoryName($t)} 'Custom'{$OutputDirectory}}
+            $dest=Assert-AiconWritableTarget $dest
+            if(-not [IO.Directory]::Exists($dest)){throw '保存先フォルダが見つかりません。'}
+        }
+        $leasePaths=@($ico,$t,$rootPath);if($dest){$leasePaths+=$dest}
+        $pathLease=[Aicon.PathValidation]::LeaseDirectories([string[]]$leasePaths)
+        if($ExpectedPathIdentity -and (Get-AiconApplyPathIdentity $ico $t $dest $rootPath) -cne $ExpectedPathIdentity){throw '確認後にパスの実体が変更されました。設定を中止しました。'}
+        if($ExpectedIconHash -and (Get-AiconHash $ico) -ne $ExpectedIconHash){throw '確認後にICOの内容が変更されました。設定を中止しました。'}
         if ([IO.Directory]::Exists($t)) {
             $t=Assert-AiconWritableTarget $t
             $path=Get-AiconFullPath (Join-Path $t 'desktop.ini');$targetLock=Enter-AiconTargetLock $path;$backup=Save-AiconBackup $rootPath 'Folder' $path $t
@@ -239,8 +274,6 @@ function Set-AiconFactoryIcon {
             $shell=New-Object -ComObject WScript.Shell
             if ($ext -eq '.lnk') { $path=Assert-AiconWritableTarget $t;$targetLock=Enter-AiconTargetLock $path;$backup=Save-AiconBackup $rootPath 'Shortcut' $path }
             else {
-                $dest= switch ($Destination) { 'Desktop' { [Environment]::GetFolderPath('Desktop') }; 'SameFolder' { [IO.Path]::GetDirectoryName($t) }; 'Custom' { if (-not $OutputDirectory) { throw '保存先フォルダを指定してください。' };$OutputDirectory } }
-                $dest=Assert-AiconWritableTarget $dest;if (-not [IO.Directory]::Exists($dest)) { throw '保存先フォルダが見つかりません。' }
                 if (-not $ShortcutName) { $ShortcutName=[IO.Path]::GetFileNameWithoutExtension($t) };$ShortcutName=Assert-AiconName $ShortcutName
                 $reserved=New-AiconReservedFile $dest $ShortcutName '.lnk';$path=$reserved.Path;$ownedReservation=$path;$reserved.Stream.Dispose();$reserved=$null
                 # A newly reserved empty shortcut is owned by this call, not a pre-existing file.
@@ -264,17 +297,22 @@ function Set-AiconFactoryIcon {
         $backup.Record.AfterHash=Get-AiconHash $stage
         $backup.Record.State='committing';Write-AiconManifest $backup.Directory $backup.Record
         Assert-AiconSnapshot $backup
-        $mutationStarted=$true
+        [void](Get-AiconFullPath $stage);[void](Assert-AiconWritableTarget $path)
+        if($ExpectedPathIdentity -and (Get-AiconApplyPathIdentity $ico $t $dest $rootPath) -cne $ExpectedPathIdentity){throw '確認後にパスの実体が変更されました。設定を中止しました。'}
+        if($ExpectedIconHash -and (Get-AiconHash $ico) -ne $ExpectedIconHash){throw '確認後にICOの内容が変更されました。設定を中止しました。'}
+        $phase='CommitContent';$mutationStarted=$true
         if ([IO.File]::Exists($path)) {
             $a=[IO.File]::GetAttributes($path);[IO.File]::SetAttributes($path,($a -band (-bnot [IO.FileAttributes]::ReadOnly)))
             [IO.File]::Replace($stage,$path,[System.Management.Automation.Language.NullString]::Value)
         } else { [IO.File]::Move($stage,$path) }
-        [IO.File]::SetAttributes($path,[IO.FileAttributes]$backup.Record.AfterFileAttributes)
-        if ($backup.Record.Folder) { [IO.File]::SetAttributes($backup.Record.Folder,[IO.FileAttributes]$backup.Record.AfterFolderAttributes) }
+        $phase='CommitAttributes'
+        [IO.File]::SetAttributes($path,(ConvertTo-AiconFileAttributes $backup.Record.AfterFileAttributes))
+        if ($backup.Record.Folder) { [IO.File]::SetAttributes($backup.Record.Folder,(ConvertTo-AiconFileAttributes $backup.Record.AfterFolderAttributes)) }
+        $phase='Verify';Assert-AiconApplied $backup
+        $phase='BackupFinalize'
         Complete-AiconBackup $backup
-        try { Invoke-AiconRefresh $t } catch { Write-Warning '表示の更新が遅れる場合があります。' }
-        Write-AiconLog $rootPath 'Apply' '' $ico $t $true
-        return [pscustomobject]@{TargetPath=$path;BackupId=$backup.Record.Id}
+        $notice=Complete-AiconApplyNotifications $rootPath $ico $t $backup.Record.Id
+        return [pscustomobject]@{TargetPath=$path;BackupId=$backup.Record.Id;TargetHash=$backup.Record.AfterHash;WriteVerified=$true;RefreshRequested=$notice.RefreshRequested;LogRecorded=$notice.LogRecorded;Warnings=$notice.Warnings}
     } catch {
         $errorRecord=$_
         if ($backup -and $mutationStarted) {
@@ -284,13 +322,14 @@ function Set-AiconFactoryIcon {
             # Delete only this invocation's unmodified empty reservation.
             if ((Get-AiconFullPath $ownedReservation) -eq $ownedReservation -and (Get-Item -LiteralPath $ownedReservation -ErrorAction Stop).Length -eq 0) { [IO.File]::Delete($ownedReservation) }
         }
-        Write-AiconLog $rootPath 'Apply' '' $Icon $Target $false $errorRecord.Exception.Message;throw $errorRecord
+        Write-AiconLog $rootPath 'Apply' '' $Icon $Target $false $errorRecord.Exception.Message -Phase $phase -BackupId $(if($backup){$backup.Record.Id}else{''});throw $errorRecord
     } finally {
         if ($reserved) { $reserved.Stream.Dispose() }
-        if ($stage -and [IO.File]::Exists($stage)) { try { [IO.File]::Delete($stage) } catch { Write-Warning ('一時ファイルを削除できません: '+$stage) } }
+        if ($stage -and [IO.File]::Exists($stage)) { try { [void](Get-AiconFullPath $stage);[IO.File]::Delete($stage) } catch { Write-Warning ('一時ファイルを削除できません: '+$stage) } }
         if ($link) { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($link) }
         if ($shell) { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($shell) }
         if ($targetLock) { $targetLock.ReleaseMutex();$targetLock.Dispose() }
+        if ($pathLease) { $pathLease.Dispose() }
     }
 }
 function Restore-AiconFactoryIcon {
@@ -325,7 +364,9 @@ function Start-AiconFactory {
         [void][Diagnostics.Process]::Start($startInfo);return
     }
     . (Join-Path $PSScriptRoot 'Gui.ps1')
-    Show-AiconFactoryWindow -Root $Root
+    # Explicit alternate Root is the existing launcher test-root contract.
+    # Normal launches use the user's stable LocalApplicationData directory.
+    if($Root -ine $script:DefaultRoot){Show-AiconFactoryWindow -Root $Root -UserDataRoot $Root}else{Show-AiconFactoryWindow -Root $Root}
 }
 function aicon {
     [CmdletBinding()]param([Parameter(Position=0)][string]$Source,[string]$Name,[string]$Category='Other',[string]$Target,[string]$Root=$script:DefaultRoot,[ValidateSet('Desktop','SameFolder','Custom')][string]$Destination='Desktop',[string]$OutputDirectory,[string]$ShortcutName)
@@ -333,4 +374,5 @@ function aicon {
 }
 . (Join-Path $PSScriptRoot 'ErrorPresentation.ps1')
 . (Join-Path $PSScriptRoot 'Batch.ps1')
+. (Join-Path $PSScriptRoot 'Workflow.ps1')
 Export-ModuleMember -Function @('New-AiconFactoryBatch','New-AiconFactoryIcon','Set-AiconFactoryIcon','Restore-AiconFactoryIcon','Start-AiconFactory','aicon')

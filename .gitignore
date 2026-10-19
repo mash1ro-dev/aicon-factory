@@ -13,3 +13,22 @@
 *.log
 *.tmp
 *.bak
+/settings.json
+/settings.json.lock
+
+# Credentials and local-only audit evidence
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/Tests/*.json
+/docs/*EVIDENCE*.json
+/docs/*SOURCES.json
+/docs/*CHECKPOINT.json
+/docs/*READONLY.json
+
+/docs/*-VALIDATION.md
+/docs/PREVIOUS-179-CASES.*
+/Tests/Desktop-Exact-Approved.ps1
+/Tests/desktop.ini

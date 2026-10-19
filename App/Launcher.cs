@@ -9,9 +9,9 @@ using System.Management.Automation.Runspaces;
 using System.Runtime.InteropServices;
 using System.Web.Script.Serialization;
 using Microsoft.PowerShell;
-[assembly: System.Reflection.AssemblyVersion("0.1.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersion("0.1.0")]
+[assembly: System.Reflection.AssemblyVersion("0.1.1.0")]
+[assembly: System.Reflection.AssemblyFileVersion("0.1.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersion("0.1.1")]
 internal static class IconFactoryLauncher {
     [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();
     static readonly JavaScriptSerializer Json=new JavaScriptSerializer();
